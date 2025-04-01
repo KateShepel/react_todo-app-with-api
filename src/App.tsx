@@ -67,7 +67,7 @@ export const App: React.FC = () => {
 
         return todosService
           .updateTodo(updateTodo)
-          .then((savedTodo) => {
+          .then(savedTodo => {
             setTodos(prevtodos =>
               prevtodos.map(prevTodo => {
                 if (prevTodo.id === updateTodo.id) {
@@ -78,6 +78,7 @@ export const App: React.FC = () => {
               }),
             );
             inputRef.current?.focus();
+
             return savedTodo;
           })
           .catch(() => {

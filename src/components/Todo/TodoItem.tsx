@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
 
@@ -18,6 +18,8 @@ export const TodoItem: React.FC<Props> = ({
   const [isFormActive, setIsFormActive] = useState(false);
   const [updateTitle, setUpdateTitle] = useState(todo.title);
 
+  const editInputRef = useRef<HTMLInputElement | null>(null);
+
   const updateHandler = useCallback(() => {
     const trimTitle = updateTitle.trim();
 
@@ -36,7 +38,10 @@ export const TodoItem: React.FC<Props> = ({
     onUpdate?.([{ ...todo, title: trimTitle }]).then(resolvedTodos => {
       if (resolvedTodos.some(resTodo => resTodo?.id === todo.id)) {
         setIsFormActive(false);
-      }
+        return;
+      };
+
+      editInputRef.current?.focus();
     });
   }, [todo, updateTitle, onUpdate, onDelete]);
 
@@ -104,6 +109,7 @@ export const TodoItem: React.FC<Props> = ({
               type="text"
               className="todo__title-field"
               autoFocus
+              ref={editInputRef}
               value={updateTitle}
               onChange={event => setUpdateTitle(event.target.value)}
               onBlur={updateHandler}
