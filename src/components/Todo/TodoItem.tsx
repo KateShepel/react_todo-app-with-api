@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
@@ -38,8 +40,9 @@ export const TodoItem: React.FC<Props> = ({
     onUpdate?.([{ ...todo, title: trimTitle }]).then(resolvedTodos => {
       if (resolvedTodos.some(resTodo => resTodo?.id === todo.id)) {
         setIsFormActive(false);
+
         return;
-      };
+      }
 
       editInputRef.current?.focus();
     });
