@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
 
@@ -11,124 +11,123 @@ type Props = {
   onUpdate?: (v: Todo[]) => Promise<(Todo | void)[]>;
 };
 
-export const TodoItem: React.FC<Props> = ({
-  todo,
-  onDelete,
-  isLoading,
-  onUpdate,
-}) => {
-  const { id, completed, title } = todo;
-  const [isFormActive, setIsFormActive] = useState(false);
-  const [updateTitle, setUpdateTitle] = useState(title);
+export const TodoItem: React.FC<Props> = memo(
+  ({ todo, onDelete, isLoading, onUpdate }) => {
+    const { id, completed, title } = todo;
+    const [isFormActive, setIsFormActive] = useState(false);
+    const [updateTitle, setUpdateTitle] = useState(title);
 
-  const editInputRef = useRef<HTMLInputElement | null>(null);
+    const editInputRef = useRef<HTMLInputElement | null>(null);
 
-  const updateHandler = useCallback(() => {
-    const trimTitle = updateTitle.trim();
+    const updateHandler = useCallback(() => {
+      const trimTitle = updateTitle.trim();
 
-    if (title === trimTitle) {
-      setIsFormActive(false);
-
-      return;
-    }
-
-    if (!trimTitle) {
-      onDelete?.(id);
-
-      return;
-    }
-
-    onUpdate?.([{ ...todo, title: trimTitle }]).then(resolvedTodos => {
-      if (resolvedTodos.some(resTodo => resTodo?.id === id)) {
+      if (title === trimTitle) {
         setIsFormActive(false);
 
         return;
       }
 
-      editInputRef.current?.focus();
-    });
-  }, [todo, id, title, updateTitle, onUpdate, onDelete]);
+      if (!trimTitle) {
+        onDelete?.(id);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsFormActive(false);
+        return;
       }
-    };
 
-    document.addEventListener('keydown', handleKeyDown);
+      onUpdate?.([{ ...todo, title: trimTitle }]).then(resolvedTodos => {
+        if (resolvedTodos.some(resTodo => resTodo?.id === id)) {
+          setIsFormActive(false);
 
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+          return;
+        }
 
-  return (
-    <>
-      <div data-cy="Todo" className={cn('todo', { completed: completed })}>
-        <label className="todo__status-label">
-          <input
-            data-cy="TodoStatus"
-            type="checkbox"
-            className="todo__status"
-            checked={completed}
-            onChange={() => onUpdate?.([{ ...todo, completed: !completed }])}
-          />
-        </label>
+        editInputRef.current?.focus();
+      });
+    }, [todo, id, title, updateTitle, onUpdate, onDelete]);
 
-        {!isFormActive ? (
-          <>
-            <span
-              data-cy="TodoTitle"
-              className="todo__title"
-              onDoubleClick={() => {
-                setIsFormActive(true);
-              }}
-            >
-              {title}
-            </span>
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsFormActive(false);
+        }
+      };
 
-            <button
-              type="button"
-              className="todo__remove"
-              data-cy="TodoDelete"
-              onClick={() => {
-                onDelete?.(id);
-              }}
-            >
-              ×
-            </button>
-          </>
-        ) : (
-          <form
-            onSubmit={event => {
-              event.preventDefault();
-              updateHandler();
-            }}
-          >
+      document.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }, []);
+
+    return (
+      <>
+        <div data-cy="Todo" className={cn('todo', { completed: completed })}>
+          <label className="todo__status-label">
             <input
-              data-cy="TodoTitleField"
-              type="text"
-              className="todo__title-field"
-              autoFocus
-              ref={editInputRef}
-              value={updateTitle}
-              onChange={event => setUpdateTitle(event.target.value)}
-              onBlur={updateHandler}
+              data-cy="TodoStatus"
+              type="checkbox"
+              className="todo__status"
+              checked={completed}
+              onChange={() => onUpdate?.([{ ...todo, completed: !completed }])}
             />
-          </form>
-        )}
+          </label>
 
-        <div
-          data-cy="TodoLoader"
-          className={cn('modal overlay', {
-            'is-active': isLoading,
-          })}
-        >
-          <div className="modal-background has-background-white-ter" />
-          <div className="loader" />
+          {!isFormActive ? (
+            <>
+              <span
+                data-cy="TodoTitle"
+                className="todo__title"
+                onDoubleClick={() => {
+                  setIsFormActive(true);
+                }}
+              >
+                {title}
+              </span>
+
+              <button
+                type="button"
+                className="todo__remove"
+                data-cy="TodoDelete"
+                onClick={() => {
+                  onDelete?.(id);
+                }}
+              >
+                ×
+              </button>
+            </>
+          ) : (
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+                updateHandler();
+              }}
+            >
+              <input
+                data-cy="TodoTitleField"
+                type="text"
+                className="todo__title-field"
+                autoFocus
+                ref={editInputRef}
+                value={updateTitle}
+                onChange={event => setUpdateTitle(event.target.value)}
+                onBlur={updateHandler}
+              />
+            </form>
+          )}
+
+          <div
+            data-cy="TodoLoader"
+            className={cn('modal overlay', {
+              'is-active': isLoading,
+            })}
+          >
+            <div className="modal-background has-background-white-ter" />
+            <div className="loader" />
+          </div>
         </div>
-      </div>
-    </>
-  );
-};
+      </>
+    );
+  },
+);
+
+TodoItem.displayName = 'TodoItem';
