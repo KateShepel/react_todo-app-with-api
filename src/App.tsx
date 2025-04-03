@@ -1,6 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as todosService from './api/todos';
 import { Header } from './components/Header/Header';
 import { TodoList } from './components/TodoList/TodoList';
@@ -105,7 +111,7 @@ export const App: React.FC = () => {
     [todos, inputRef],
   );
 
-  const deleteTodo = (todoId: number) => {
+  const deleteTodo = useCallback((todoId: number) => {
     setLoadingIds(prevTodoId => [...prevTodoId, todoId]);
     todosService
       .deleteTodo(todoId)
@@ -122,7 +128,7 @@ export const App: React.FC = () => {
           prevTodosId.filter(prevTodoId => prevTodoId !== todoId),
         );
       });
-  };
+  }, []);
 
   const filteredTodos = todos.filter(todo => {
     switch (filter) {
@@ -138,8 +144,12 @@ export const App: React.FC = () => {
     }
   });
 
-  const activeTodos = todos.filter(todo => !todo.completed);
-  const complitedTodos = todos.filter(todo => todo.completed);
+  const activeTodos = useMemo(() => {
+    return todos.filter(todo => !todo.completed);
+  }, [todos]);
+  const complitedTodos = useMemo(() => {
+    return todos.filter(todo => todo.completed);
+  }, [todos]);
 
   return (
     <div className="todoapp">
