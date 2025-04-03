@@ -12,7 +12,18 @@ type Props = {
 };
 
 export const Footer: React.FC<Props> = memo(
-  ({ filter, onFilter, activeTodosCount, complitedTodos, onDelete }) => {
+  ({
+    filter,
+    onFilter,
+    activeTodosCount,
+    complitedTodos,
+    onDelete
+  }) => {
+    const deleteAllCompletedTodos = () => {
+      complitedTodos.map(todo => {
+        onDelete(todo.id);
+      });
+    }
     return (
       <footer className="todoapp__footer" data-cy="Footer">
         <span className="todo-count" data-cy="TodosCounter">
@@ -42,11 +53,7 @@ export const Footer: React.FC<Props> = memo(
           className="todoapp__clear-completed"
           data-cy="ClearCompletedButton"
           disabled={!complitedTodos.length}
-          onClick={() => {
-            complitedTodos.map(todo => {
-              onDelete(todo.id);
-            });
-          }}
+          onClick={deleteAllCompletedTodos}
         >
           Clear completed
         </button>
