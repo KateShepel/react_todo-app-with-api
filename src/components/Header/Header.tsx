@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 import { Form } from '../Form/Form';
 import { Todo } from '../../types/Todo';
 import cn from 'classnames';
@@ -12,7 +12,7 @@ type Props = {
   onUpdate: (todos: Todo[]) => void;
 };
 
-export const Header = forwardRef<HTMLInputElement, Props>((props, ref) => {
+const HeaderFC = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { query, onInput, onAdd, isLoading, todos, onUpdate } = props;
 
   const isCompletedAll = todos.every(todo => todo.completed);
@@ -50,5 +50,9 @@ export const Header = forwardRef<HTMLInputElement, Props>((props, ref) => {
     </header>
   );
 });
+
+HeaderFC.displayName = 'HeaderFC';
+
+export const Header = memo(HeaderFC);
 
 Header.displayName = 'Header';

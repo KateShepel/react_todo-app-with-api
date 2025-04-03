@@ -1,4 +1,4 @@
-import { forwardRef, useEffect } from 'react';
+import { forwardRef, memo, useEffect } from 'react';
 
 type Props = {
   query: string;
@@ -7,7 +7,7 @@ type Props = {
   isLoading: boolean;
 };
 
-export const Form = forwardRef<HTMLInputElement, Props>((props, ref) => {
+const FormFC = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const { query, onInput, onAdd, isLoading } = props;
 
   useEffect(() => {
@@ -37,5 +37,9 @@ export const Form = forwardRef<HTMLInputElement, Props>((props, ref) => {
     </form>
   );
 });
+
+FormFC.displayName = 'FormFC';
+
+export const Form = memo(FormFC);
 
 Form.displayName = 'Form';
